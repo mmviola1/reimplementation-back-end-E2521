@@ -240,6 +240,26 @@ class Api::V1::AssignmentsController < ApplicationController
   end
 
 
+  def get_team
+    team = Team.includes(:users).find_by(id: params[:team_id])
+
+    if team.nil?
+      render json: { error: "Team not found" }, status: :not_found
+    else
+      render json: {
+        id: team.id,
+        name: team.name,
+        participants: team.participants.map do |participant|
+          participant.as_json.merge(
+            name: participant.user.name,
+            full_name: participant.user.full_name
+          )
+        end
+      }, status: :ok
+    end
+  end
+
+
   private
   # Only allow a list of trusted parameters through.
   def assignment_params

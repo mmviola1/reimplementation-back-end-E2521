@@ -41,6 +41,8 @@ Rails.application.routes.draw do
 
         member do
           get 'list_submissions', action: :list_submissions
+
+          get 'teams/:team_id', action: :get_team
         end
       end
 
@@ -116,12 +118,17 @@ Rails.application.routes.draw do
 
       resources :participants do
         collection do
-          get '/user/:user_id', to: 'participants#list_user_participants'
+          get '/user/:user_id', to: 'participants#user_index'
           get '/assignment/:assignment_id', to: 'participants#list_assignment_participants'
           get '/:id', to: 'participants#show'
           post '/:authorization', to: 'participants#add'
           patch '/:id/:authorization', to: 'participants#update_authorization'
           delete '/:id', to: 'participants#destroy'
+        end
+
+        member do
+          post '/grade',  to: 'participants#save_grade'
+          get 'peer_reviews', to: 'participants#peer_reviews'
         end
       end
     end

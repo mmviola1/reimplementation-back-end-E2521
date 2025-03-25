@@ -4,7 +4,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '3.2.7'
 
 gem 'mysql2', '~> 0.5.5'
-gem 'puma', '~> 5.0'
+gem 'puma', '>= 6.0'
 gem 'rails', '~> 8.0', '>= 8.0.1'
 gem 'rswag-api'
 gem 'rswag-ui'
@@ -39,7 +39,6 @@ gem 'find_with_order'
 group :development, :test do
   gem 'debug', platforms: %i[mri mingw x64_mingw]
   gem 'factory_bot_rails'
-  gem 'database_cleaner-active_record'
   gem 'faker'
   gem 'rspec-rails'
   gem 'rswag-specs'

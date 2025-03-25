@@ -64,7 +64,6 @@ class Role < ApplicationRecord
   end
 
   def as_json(options = nil)
-    options = options || {} # Ensure options is a hash
     super(options.merge({ only: %i[id name parent_id] }))
   end
 end

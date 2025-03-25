@@ -14,7 +14,7 @@ RSpec.describe 'Roles API', type: :request do
       full_name: "Admin A",
       email: "testuser@example.com",
       mru_directory_path: "/home/testuser",
-      )
+    )
   }
 
   let(:token) { JsonWebToken.encode({id: adm.id}) }
@@ -68,9 +68,6 @@ RSpec.describe 'Roles API', type: :request do
         let(:role) { { name: '' } }
 
         after do |example|
-          puts "Response status: #{response.status}" if response
-          puts "Response body: #{response.body}" if response&.body
-
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
@@ -115,7 +112,7 @@ RSpec.describe 'Roles API', type: :request do
         },
         required: [ 'name' ]
       }
-
+      
       response(200, 'successful') do
 
         after do |example|
@@ -143,7 +140,7 @@ RSpec.describe 'Roles API', type: :request do
       end
     end
 
-    put('update role') do
+    put('update role') do 
       tags 'Roles'
       consumes 'application/json'
       parameter name: :role, in: :body, schema: {
@@ -173,8 +170,6 @@ RSpec.describe 'Roles API', type: :request do
         let(:id) { Role.create(name: 'Test Role').id }
 
         after do |example|
-          puts "Response status: #{response.status}" if response
-          puts "Response body: #{response.body}" if response&.body
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)

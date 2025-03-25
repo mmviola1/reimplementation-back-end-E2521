@@ -15,21 +15,21 @@ RSpec.describe 'api/v1/questions', type: :request do
     mru_directory_path: "/home/testuser",
     ) }
 
-  let!(:questionnaire) do
-    instructor
-    Questionnaire.create(
-      name: 'Questionnaire 1',
-      questionnaire_type: 'AuthorFeedbackReview',
-      private: true,
-      min_question_score: 0,
-      max_question_score: 10,
-      instructor_id: instructor.id
-    )
-  end
-
   let(:token) { JsonWebToken.encode({id: instructor.id}) }
   let(:Authorization) { "Bearer #{token}" }
   path '/api/v1/questions' do
+    let(:questionnaire) do
+      instructor
+      Questionnaire.create(
+        name: 'Questionnaire 1',
+        questionnaire_type: 'AuthorFeedbackReview',
+        private: true,
+        min_question_score: 0,
+        max_question_score: 10,
+        instructor_id: instructor.id
+      )
+    end
+
     let(:question1) do
       questionnaire
       Item.create(
@@ -76,7 +76,6 @@ RSpec.describe 'api/v1/questions', type: :request do
           txt: "test item",
           question_type: "multiple_choice", 
           break_before: false,
-          seq: 1,
           weight: 10
         }
       end
@@ -110,12 +109,15 @@ RSpec.describe 'api/v1/questions', type: :request do
           txt: { type: :string },
           question_type: { type: :string },
         },
-        required: %w[weight questionnaire_id break_before txt question_type]
+        required: %w[weight questionnaire_id break_before txt question_type]      
       }
 
       # post request on /api/v1/questions returns 201 created response and creates a item with given valid parameters
       response(201, 'created') do
-        let(:item) { valid_question_params }
+        let(:item) do
+          questionnaire
+          Item.create(valid_question_params)
+        end
         run_test! do
           expect(response.body).to include('"seq":1')
         end
@@ -132,7 +134,10 @@ RSpec.describe 'api/v1/questions', type: :request do
 
       # post request on /api/v1/questions returns 422 unprocessable entity when incorrect parameters are passed to create a item
       response(422, 'unprocessable entity') do
-        let(:item) { invalid_question_params2 }   # <--- pass invalid params directly to the request
+        let(:item) do
+          instructor
+          Item.create(invalid_question_params2)
+        end
         run_test!
       end
 
@@ -144,12 +149,24 @@ RSpec.describe 'api/v1/questions', type: :request do
 
     parameter name: 'id', in: :path, type: :integer
 
+    let(:questionnaire) do
+      instructor
+      Questionnaire.create(
+        name: 'Questionnaire 1',
+        questionnaire_type: 'AuthorFeedbackReview',
+        private: true,
+        min_question_score: 0,
+        max_question_score: 10,
+        instructor_id: instructor.id
+      )
+    end
+
     let(:question1) do
       questionnaire
       Item.create(
         seq: 1, 
         txt: "test item 1",
-        question_type: "Scale", 
+        question_type: "multiple_choice", 
         break_before: true, 
         weight: 5,
         questionnaire: questionnaire
@@ -161,7 +178,7 @@ RSpec.describe 'api/v1/questions', type: :request do
       Item.create(
         seq: 2, 
         txt: "test item 2",
-        question_type: "Scale", 
+        question_type: "multiple_choice", 
         break_before: false, 
         weight: 10,
         questionnaire: questionnaire
@@ -330,6 +347,14 @@ RSpec.describe 'api/v1/questions', type: :request do
   path '/api/v1/questions/delete_all/questionnaire/{id}' do
     parameter name: 'id', in: :path, type: :integer
 
+    # Creation of dummy objects for the test with the help of let statements
+    let(:role) { Role.create(name: 'Instructor', parent_id: nil, default_page_id: nil) }
+    
+    let(:instructor) do 
+      role
+      Instructor.create(name: 'testinstructor', email: 'test@test.com', full_name: 'Test Instructor', password: '123456', role: role)
+    end
+
     let(:questionnaire) do
       instructor
       Questionnaire.create(
@@ -397,6 +422,14 @@ RSpec.describe 'api/v1/questions', type: :request do
 
   path '/api/v1/questions/show_all/questionnaire/{id}' do
     parameter name: 'id', in: :path, type: :integer
+
+    # Creation of dummy objects for the test with the help of let statements
+    let(:role) { Role.create(name: 'Instructor', parent_id: nil, default_page_id: nil) }
+    
+    let(:instructor) do 
+      role
+      Instructor.create(name: 'testinstructor', email: 'test@test.com', full_name: 'Test Instructor', password: '123456', role: role)
+    end
 
     let(:questionnaire) do
       instructor
@@ -491,6 +524,14 @@ RSpec.describe 'api/v1/questions', type: :request do
   end
 
   path '/api/v1/questions/types' do
+
+    # Creation of dummy objects for the test with the help of let statements
+    let(:role) { Role.create(name: 'Instructor', parent_id: nil, default_page_id: nil) }
+    
+    let(:instructor) do 
+      role
+      Instructor.create(name: 'testinstructor', email: 'test@test.com', full_name: 'Test Instructor', password: '123456', role: role)
+    end
 
     let(:questionnaire) do
       instructor
